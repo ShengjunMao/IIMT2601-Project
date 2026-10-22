@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FanFarmer — Interactive Demo</title>
+<style>
+:root {
+  --green:#286448; --dark:#173c2b; --mint:#e9f1e4;
+  --bg:#f7f8f2; --text:#21372c; --muted:#718075;
+  --line:#e1e7dc; --orange:#a56519;
+}
+* { box-sizing:border-box }
+body {
+  margin:0; background:#e5eadf; color:var(--text);
+  font-family:Inter,Arial,sans-serif;
+}
+button,input,select,textarea { font:inherit }
+button { cursor:pointer }
+button:focus-visible,a:focus-visible {
+  outline:3px solid #d6ad50; outline-offset:3px;
+}
+.shell {
+  max-width:1040px; margin:32px auto; padding:0 24px;
+  display:grid; grid-template-columns:1fr 390px; gap:64px;
+  align-items:start;
+}
+.presentation { padding-top:75px }
+.brand { font-size:25px; font-weight:800; letter-spacing:-1px }
+.presentation h1 {
+  font-size:54px; letter-spacing:-2px; line-height:1.08;
+  margin:28px 0 20px;
+}
+.presentation p { color:#607060; line-height:1.8 }
+.eyebrow {
+  text-transform:uppercase; letter-spacing:2px;
+  font-size:11px; font-weight:800; color:var(--green);
+}
+.panel {
+  background:#f6f8f1; border:1px solid #d6dece;
+  border-radius:20px; padding:22px; margin-top:30px;
+}
+.panel button { margin:5px 0 }
+.phone {
+  height:844px; max-height:calc(100vh - 64px);
+  min-height:540px; background:var(--bg);
+  border:8px solid #263c2e; border-radius:44px;
+  overflow:hidden; box-shadow:0 30px 80px #243b2626;
+  display:flex; flex-direction:column; position:relative;
+}
+.status {
+  padding:13px 22px 8px; display:flex; justify-content:space-between;
+  font-size:11px; font-weight:700; flex-shrink:0;
+}
+.top {
+  padding:12px 20px; display:flex; justify-content:space-between;
+  align-items:center; gap:8px; flex-shrink:0;
+}
+.top .brand { font-size:22px }
+.icon {
+  border:1px solid var(--line); background:white;
+  border-radius:12px; min-width:40px; min-height:40px;
+}
+main { overflow-y:auto; flex:1; padding:8px 20px 24px }
+h1,h2,h3,p { margin-top:0 }
+h1 { font-size:29px; letter-spacing:-1px; margin-bottom:10px }
+h2 { font-size:21px; letter-spacing:-.5px }
+h3 { font-size:16px; margin-bottom:7px }
+p { font-size:13px; line-height:1.6 }
+.muted { color:var(--muted) }
+.small { font-size:11px }
+.row { display:flex; justify-content:space-between; align-items:center; gap:10px }
+.section { margin:25px 0 12px }
+.card {
+  background:white; border:1px solid var(--line);
+  border-radius:20px; padding:17px; margin-bottom:13px;
+}
+.card p:last-child { margin-bottom:0 }
+.btn {
+  border:0; border-radius:13px; padding:14px 16px;
+  font-weight:700; font-size:13px; width:100%;
+  background:var(--green); color:white;
+}
+.btn:hover { filter:brightness(.95) }
+.btn.secondary { background:var(--mint); color:var(--green) }
+.btn.outline { background:transparent; color:var(--green); border:1px solid var(--line) }
+.btn:disabled { opacity:.45; cursor:not-allowed }
+.link {
+  padding:5px 0; background:none; border:0;
+  color:var(--green); font-size:12px; font-weight:700;
+}
+.stack { display:grid; gap:10px }
+.pill {
+  display:inline-flex; align-items:center; gap:4px;
+  border-radius:20px; background:var(--mint);
+  color:var(--green); padding:6px 9px; font-size:10px; font-weight:700;
+}
+.pill.warn { background:#fff0d6; color:var(--orange) }
+.pill.neutral { background:#eef0ed; color:#637067 }
+.landscape {
+  height:155px; border-radius:17px; position:relative;
+  overflow:hidden; background:linear-gradient(#cee4cd 0 51%,#8eb469 51%);
+  margin-bottom:15px;
+}
+.landscape:before {
+  content:""; position:absolute; width:380px; height:165px;
+  background:#5d8b4b; border-radius:50%; top:65px; left:-65px;
+  transform:rotate(-15deg);
+}
+.landscape:after {
+  content:""; position:absolute; width:340px; height:130px;
+  top:98px; left:70px; border-radius:50%; transform:rotate(-24deg);
+  background:repeating-linear-gradient(90deg,#9ebc6c 0 15px,#7d9e53 15px 23px);
+}
+.sun {
+  width:32px; height:32px; border-radius:50%;
+  background:#fff4bd; position:absolute; top:19px; right:35px;
+}
+.landscape .house { position:absolute; z-index:2; font-size:39px; left:42px; top:51px }
+.crop-art {
+  height:120px; display:grid; place-items:center;
+  background:#eef3e5; border-radius:15px; font-size:65px;
+  margin-bottom:14px;
+}
+.hero {
+  background:var(--dark); color:white; padding:22px;
+  border-radius:22px; margin:10px 0 18px; overflow:hidden;
+}
+.hero p { color:#c9dbbd }
+.hero .btn { background:#ddeaaf; color:var(--dark) }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:10px }
+.stat { background:#eff3e9; border-radius:13px; padding:13px }
+.stat strong { display:block; font-size:17px; margin-bottom:5px }
+.stat span { font-size:10px; color:var(--muted) }
+label { display:block; font-size:12px; font-weight:700; margin:16px 0 7px }
+input,select,textarea {
+  width:100%; border:1px solid #d7dfd1; border-radius:12px;
+  background:white; padding:13px; color:var(--text);
+}
+textarea { min-height:90px; resize:vertical }
+.tabs { display:flex; background:#eaf0e5; border-radius:13px; padding:4px; margin-bottom:18px }
+.tabs button {
+  flex:1; padding:11px; border:0; border-radius:10px;
+  background:none; color:var(--muted); font-weight:700; font-size:12px;
+}
+.tabs .active { background:white; color:var(--green); box-shadow:0 2px 5px #00000008 }
+.notice {
+  padding:13px; border-radius:13px; background:#fff2dc;
+  color:#875c20; font-size:12px; line-height:1.6; margin:13px 0;
+}
+.notice.good { background:#e9f2e3; color:var(--green) }
+nav {
+  display:flex; border-top:1px solid var(--line); background:#fff;
+  padding:10px 8px 16px; flex-shrink:0;
+}
+nav button {
+  flex:1; border:0; background:none; font-size:10px;
+  color:#899287; padding:3px; min-height:43px;
+}
+nav b { display:block; font-size:19px; margin-bottom:5px }
+nav button.active { color:var(--green); font-weight:bold }
+.summary-row { display:flex; justify-content:space-between; gap:12px; margin:13px 0; font-size:13px }
+hr { border:0; border-top:1px solid var(--line); margin:18px 0 }
+.progress { height:7px; background:#e8eedf; border-radius:9px; margin:14px 0 }
+.progress span { display:block; background:#79a75a; height:100%; border-radius:9px }
+.timeline { border-left:2px solid #d9e6cd; padding-left:16px; margin:15px 0 }
+.timeline p { margin-bottom:12px }
+.empty { text-align:center; padding:28px 10px }
+.empty .emoji { font-size:58px; margin-bottom:18px }
+.success { text-align:center; padding:35px 0 20px }
+.success .check {
+  display:grid; place-items:center; width:78px; height:78px;
+  border-radius:50%; background:#dfedce; color:var(--green);
+  font-size:38px; margin:0 auto 22px;
+}
+.demo-tag { font-size:9px; background:#edf0e6; color:#71806a; padding:5px 7px; border-radius:5px }
+#toast {
+  position:absolute; bottom:85px; left:20px; right:20px;
+  background:#203c2e; color:white; padding:13px;
+  border-radius:12px; font-size:12px; display:none;
+  z-index:20; box-shadow:0 8px 30px #0002;
+}
+@media(max-width:760px) {
+  .shell { display:block; padding:0; margin:0; max-width:430px }
+  .presentation { display:none }
+  .phone {
+    border:0; border-radius:0; height:100dvh; max-height:none;
+    min-height:0; box-shadow:none;
+  }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="presentation">
+    <div class="brand">🌱 fanfarmer</div>
+    <h1>A little land.<br>A lot to grow.</h1>
+    <p>Rent a field, grow your favourite crops,<br>
+       and let local farmers lend a hand.</p>
+    <div class="panel">
+      <div class="eyebrow">Classroom demo controls</div>
+      <p style="margin-top:12px">Jump to a scene or switch roles to demonstrate the complete service flow.</p>
+      <button class="btn secondary" onclick="scene('new')">① New customer</button>
+      <button class="btn secondary" onclick="scene('grown')">② Farm with crops</button>
+      <button class="btn secondary" onclick="scene('care')">③ Crop needs attention</button>
+      <button class="btn outline" onclick="switchRole()">⇄ Switch customer / farmer</button>
+      <button class="link" onclick="resetDemo()">Reset entire demo</button>
+    </div>
+    <p class="small">Interactive prototype · Simulated data only<br>
+      No real payments, authentication, or notifications.</p>
+  </aside>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>●●● &nbsp; Wi-Fi &nbsp; ▰</span></div>
+    <header class="top" id="header"></header>
+    <main id="app"></main>
+    <nav id="nav"></nav>
+    <div id="toast" role="status" aria-live="polite"></div>
+  </div>
+</div>
+<script>
+const fields = [
+  {id:1,name:"Green Valley",plot:"A3",size:20,price:45,location:"Northside Farm",icon:"🏡"},
+  {id:2,name:"Sunny Meadows",plot:"B7",size:30,price:65,location:"Riverside Farm",icon:"🌳"}
+];
+const crops = [
+  {id:1,name:"Tomatoes",icon:"🍅",price:12,days:75,desc:"A sunny-season favourite. Enjoy watching your tomatoes grow from seedlings to ripe fruit."},
+  {id:2,name:"Lettuce",icon:"🥬",price:8,days:40,desc:"Fresh, crisp leaves and a short growing cycle. A friendly choice for your first garden."},
+  {id:3,name:"Carrots",icon:"🥕",price:10,days:70,desc:"Sweet roots that thrive in loose soil. A rewarding addition to your little farm."}
+];
+const services = [
+  {id:1,name:"Watering",icon:"💧",price:6,desc:"A farmer waters your crop and checks soil conditions."},
+  {id:2,name:"Weeding",icon:"🌿",price:10,desc:"Remove competing weeds around your growing plants."},
+  {id:3,name:"Fertilising",icon:"🌱",price:12,desc:"Apply suitable nutrients and record the treatment."}
+];
+let s;
+function fresh() {
+  return {logged:false,name:"Alex",role:"customer",fields:[],plants:[],orders:[],tasks:[],
+    page:"welcome",tab:"fields",pending:null,paid:null,next:100,checkoutBack:"home"};
+}
+s=fresh();
+const $=id=>document.getElementById(id);
+const esc=x=>String(x).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money=n=>"$"+Number(n).toFixed(2);
+function btn(text,action,style="") {
+  return `<button class="btn ${style}" onclick="${action}">${text}</button>`;
+}
+function landscape() {
+  return `<div class="landscape"><span class="sun"></span><span class="house">🏡</span></div>`;
+}
+function toast(text) {
+  $("toast").textContent=text; $("toast").style.display="block";
+  clearTimeout(window.toastTimer);
+  window.toastTimer=setTimeout(()=>$("toast").style.display="none",3000);
+}
+function go(page,id) {
+  s.page=page; s.selected=id; render(); $("app").scrollTop=0;
+}
+function explore(tab) { s.tab=tab; go("explore") }
+function switchRole() {
+  if(!s.logged) { s.logged=true; s.name="Alex" }
+  s.role=s.role==="customer"?"farmer":"customer";
+  go(s.role==="farmer"?"tasks":"home");
+}
+function resetDemo() {
+  if(!confirm("Reset all demo data?")) return;
+  s=fresh(); render();
+}
+function scene(type) {
+  s=fresh(); s.logged=true;
+  if(type!=="new") {
+    s.fields=[{...fields[0],months:3}];
+    s.plants=[{...crops[0],uid:101,field:1,qty:1,day:18,
+      problem:type==="care",logs:[{text:"Seedlings established. Initial growth check completed.",time:"Previous update"}]}];
+    s.next=102;
+  }
+  go("home"); toast("Demo scene loaded. Previous demo data cleared.");
+}
+function render() {
+  const back={
+    login:"welcome",signup:"welcome",field:"explore",crop:"explore",
+    status:"home",services:"home",task:"tasks"
+  };
+  let backAction=back[s.page]?`go('${back[s.page]}')`:"";
+  if(s.page==="checkout") backAction="cancelCheckout()";
+  $("header").innerHTML=`
+    ${backAction?`<button class="icon" aria-label="Back" onclick="${backAction}">←</button>`:
+      `<div class="brand">🌱 fanfarmer</div>`}
+    <span class="demo-tag">${s.role==="farmer"?"FARMER DEMO":"INTERACTIVE DEMO"}</span>`;
+  const navItems=s.role==="farmer"?
+    [["tasks","▤","Tasks"],["profile","☻","Profile"]]:
+    [["home","⌂","My Farm"],["explore","✿","Explore"],["orders","▤","Orders"],["profile","☻","Profile"]];
+  $("nav").style.display=s.logged?"flex":"none";
+  $("nav").innerHTML=navItems.map(([p,icon,t])=>
+    `<button class="${s.page===p?"active":""}" onclick="go('${p}')"><b>${icon}</b>${t}</button>`).join("");
+  const views={
+    welcome:welcome,login:()=>auth(false),signup:()=>auth(true),home:home,
+    explore:catalog,field:fieldDetail,crop:cropDetail,checkout:checkout,
+    success:success,status:cropStatus,services:careMenu,orders:orders,
+    profile:profile,tasks:tasks,task:taskDetail
+  };
+  $("app").innerHTML=(views[s.page]||home)();
+}
+function welcome() {
+  return `<div style="padding-top:22px">
+    <div class="eyebrow">A farm of your own</div>
+    <h1 style="font-size:39px;margin-top:15px">Grow something<br>good.</h1>
+    <p class="muted">Your farm, wherever you are.</p>
+    ${landscape()}
+    <div class="grid" style="margin:24px 0">
+      <div class="stat"><strong>🌾 Rent</strong><span>Find your little plot</span></div>
+      <div class="stat"><strong>🌱 Grow</strong><span>Follow every stage</span></div>
+    </div>
+    <div class="stack">
+      ${btn("Create account","go('signup')")}
+      ${btn("Log in","go('login')","secondary")}
+      <button class="link" onclick="scene('care')">Try a ready-made demo →</button>
+    </div>
+    <p class="muted small" style="text-align:center;margin-top:24px">Classroom prototype. No real account required.</p>
+  </div>`;
+}
+function auth(signup) {
+  return `<h1>${signup?"Start your farm":"Welcome back"}</h1>
+    <p class="muted">${signup?"Your growing journey starts here.":"Your little farm is waiting for you."}</p>
+    <form onsubmit="login(event,${signup})">
+      ${signup?`<label>Your name</label><input id="name" required maxlength="40" placeholder="Alex">`:""}
+      <label>Email</label><input type="email" required placeholder="alex@example.com" autocomplete="off">
+      <label>Demo password</label><input type="password" required minlength="4" placeholder="Any 4+ characters" autocomplete="off">
+      <div class="notice good">Simulated authentication only. Use made-up details, not your real password.</div>
+      <button class="btn" type="submit">${signup?"Create account":"Log in"}</button>
+    </form>
+    <button class="link" style="margin-top:16px" onclick="go('${signup?"login":"signup"}')">
+      ${signup?"Already have an account? Log in":"New here? Create account"}</button>`;
+}
+function login(event,signup) {
+  event.preventDefault();
+  if(signup) s.name=$("name").value.trim()||"Alex";
+  s.logged=true; s.role="customer"; go("home");
+}
+function home() {
+  if(!s.logged) return welcome();
+  return `<div class="eyebrow">YOUR LITTLE CORNER OF GREEN</div>
+    <h1 style="margin-top:10px">Hello, ${esc(s.name)} ☀️</h1>
+    <p class="muted">${s.fields.length?"Let's see how things are growing.":"A fresh start, a little closer to nature."}</p>
+    ${!s.fields.length?`
+      <div class="hero"><h2>Your farm starts<br>with one little plot.</h2>
+        <p>Choose a field and make room for something good.</p>
+        ${landscape()}${btn("Find your first field →","explore('fields')")}
+      </div>`:`
+      <div class="row section"><h2 style="margin:0">My fields</h2>
+        <button class="link" onclick="explore('fields')">Rent more +</button></div>
+      ${s.fields.map(f=>`<div class="card">${landscape()}
+        <div class="row"><h3>${f.name}</h3><span class="pill">Active rental</span></div>
+        <p class="muted">${f.location} · Plot ${f.plot} · ${f.size} m²</p>
+        <p class="small">${f.months}-month rental · ${money(f.price)}/month</p>
+      </div>`).join("")}`}
+    <div class="row section"><h2 style="margin:0">My crops</h2>
+      ${s.fields.length?`<button class="link" onclick="explore('crops')">Add crops +</button>`:""}</div>
+    ${s.plants.length?s.plants.map(plantCard).join(""):`
+      <div class="card empty"><div class="emoji">🌱</div><h3>Something good will grow here</h3>
+      <p class="muted">${s.fields.length?"Your field is ready. Pick your first crop.":"Rent a field to start planting."}</p>
+      ${btn(s.fields.length?"Choose crops":"Explore fields",`explore('${s.fields.length?"crops":"fields"}')`,"secondary")}</div>`}`;
+}
+function plantCard(p) {
+  return `<div class="card">
+    <div class="row"><span style="font-size:36px">${p.icon}</span>
+      <span class="pill ${p.problem?"warn":""}">${p.problem?"⚠ Needs care":"✓ Healthy"}</span></div>
+    <h3 style="margin-top:12px">${p.name}</h3>
+    <p class="muted">Day ${p.day} · ${p.day<7?"Newly planted":"Growing"} · Plot ${s.fields.find(f=>f.id===p.field)?.plot||"A3"}</p>
+    <div class="progress"><span style="width:${Math.max(4,p.day/p.days*100)}%"></span></div>
+    ${btn("View crop status →",`go('status',${p.uid})`,"secondary")}
+  </div>`;
+}
+function catalog() {
+  return `<h1>Find your next growth</h1><p class="muted">A little space. Endless possibilities.</p>
+    <div class="tabs">
+      <button class="${s.tab==="fields"?"active":""}" onclick="explore('fields')">Fields</button>
+      <button class="${s.tab==="crops"?"active":""}" onclick="explore('crops')">Crops</button>
+    </div>
+    ${s.tab==="fields"?fields.map(f=>{
+      const owned=s.fields.some(x=>x.id===f.id);
+      return `<div class="card">${landscape()}
+        <div class="row"><h3>${f.name}</h3><span class="pill">${owned?"Rented by you":"Available"}</span></div>
+        <p class="muted">${f.location} · ${f.size} m²</p>
+        <div class="row"><strong>${money(f.price)} <span class="muted small">/ month</span></strong>
+        <button class="link" onclick="go('field',${f.id})">View field →</button></div></div>`;
+    }).join(""):crops.map(c=>`<div class="card"><div class="crop-art">${c.icon}</div>
+      <h3>${c.name}</h3><p class="muted">About ${c.days} days to harvest · Seedling pack</p>
+      <div class="row"><strong>${money(c.price)} <span class="muted small">/ pack</span></strong>
+      <button class="link" onclick="go('crop',${c.id})">View crop →</button></div></div>`).join("")}`;
+}
+function fieldDetail() {
+  const f=fields.find(x=>x.id===s.selected)||fields[0];
+  const owned=s.fields.some(x=>x.id===f.id);
+  return `${landscape()}<span class="pill">${owned?"Rented by you":"Available to rent"}</span>
+    <h1 style="margin-top:14px">${f.name}</h1><p class="muted">${f.location} · Plot ${f.plot}</p>
+    <div class="grid"><div class="stat"><strong>${f.size} m²</strong><span>Your private plot</span></div>
+      <div class="stat"><strong>Full sun</strong><span>Great for vegetables</span></div></div>
+    <div class="section"><h3>A little room to grow</h3>
+    <p class="muted">A prepared plot on a local farm. Choose your crops and book farmer support whenever you need it.</p></div>
+    ${owned?btn("Choose crops","explore('crops')"):`
+    <label>Rental duration</label>
+    <select id="months" onchange="updateFieldTotal(${f.price})">
+      <option value="1">1 month</option><option value="3" selected>3 months</option><option value="6">6 months</option>
+    </select>
+    <div class="summary-row"><span>Rental total</span><strong id="fieldTotal">${money(f.price*3)}</strong></div>
+    ${btn("Rent this field →",`buyField(${f.id})`)}`}`;
+}
+function updateFieldTotal(price) { $("fieldTotal").textContent=money(price*Number($("months").value)) }
+function buyField(id) {
+  const f=fields.find(x=>x.id===id),months=Number($("months").value);
+  begin({type:"field",item:id,name:f.name+" · Plot "+f.plot,total:f.price*months,months,detail:months+"-month rental"},"explore");
+}
+function cropDetail() {
+  const c=crops.find(x=>x.id===s.selected)||crops[0];
+  return `<div class="crop-art" style="height:170px">${c.icon}</div>
+    <h1>${c.name}</h1><p class="muted">${c.desc}</p>
+    <div class="grid"><div class="stat"><strong>~${c.days} days</strong><span>Estimated harvest</span></div>
+    <div class="stat"><strong>${money(c.price)}</strong><span>Per seedling pack</span></div></div>
+    ${!s.fields.length?`<div class="notice">You'll need a rented field before ordering crops.</div>
+      ${btn("Find a field","explore('fields')")}`:`
+      <label>Plant in</label><select id="plantField">${s.fields.map(f=>`<option value="${f.id}">${f.name} · Plot ${f.plot}</option>`).join("")}</select>
+      <label>Seedling packs</label><select id="qty" onchange="document.getElementById('cropTotal').textContent=money(this.value*${c.price})">
+      <option value="1">1 pack</option><option value="2">2 packs</option><option value="3">3 packs</option></select>
+      <div class="summary-row"><span>Total</span><strong id="cropTotal">${money(c.price)}</strong></div>
+      ${btn("Order crops →",`buyCrop(${c.id})`)}`}
+    <p class="small muted" style="margin-top:15px">Prototype prices and growing estimates are illustrative.</p>`;
+}
+function buyCrop(id) {
+  const c=crops.find(x=>x.id===id),qty=Number($("qty").value),field=Number($("plantField").value);
+  begin({type:"crop",item:id,name:c.name,total:c.price*qty,qty,field,detail:qty+" seedling pack(s)"},"explore");
+}
+function begin(order,back) {
+  s.pending=order; s.checkoutBack=back; s.paymentFail=false; go("checkout");
+}
+function cancelCheckout() { s.pending=null; go(s.checkoutBack||"home") }
+function checkout() {
+  const o=s.pending;
+  if(!o) return `<h1>No pending order</h1>${btn("Back to farm","go('home')")}`;
+  return `<div class="eyebrow">One step closer</div><h1 style="margin-top:10px">Checkout</h1>
+    <div class="card"><span class="pill">${{field:"Field rental",crop:"Crop order",care:"Care service"}[o.type]}</span>
+    <h2 style="margin-top:15px">${o.name}</h2><p class="muted">${esc(o.detail)}</p>
+    <hr><div class="summary-row"><span>Order total</span><strong>${money(o.total)}</strong></div></div>
+    <h3>Demo payment method</h3>
+    <div class="card"><div class="row"><span>▣ Demo card</span><strong>•••• 4242</strong></div>
+    <p class="small muted" style="margin-top:10px">No real card details required.</p></div>
+    <label for="payMode">Simulated payment result</label>
+    <select id="payMode"><option value="success">Valid card — payment succeeds</option>
+    <option value="fail" ${s.paymentFail?"selected":""}>Invalid card — payment fails</option></select>
+    ${s.paymentFail?`<div class="notice" role="alert"><strong>Payment failed.</strong><br>
+      Your demo card could not be validated. No items have been allocated.</div>
+      ${btn("Update demo payment method","fixPayment()","secondary")}`:""}
+    <p class="muted small" style="margin-top:18px">Simulation only. Clicking below will not charge any money.</p>
+    ${btn("Confirm & pay "+money(o.total),"pay()")}`;
+}
+function fixPayment() {
+  s.paymentFail=false; render(); toast("Updated to a valid demo card. Please retry payment.");
+}
+function pay() {
+  if(!s.pending) return;
+  if($("payMode").value==="fail") { s.paymentFail=true; render(); return }
+  const o={...s.pending,id:++s.next};
+  if(o.type==="field") {
+    if(s.fields.some(f=>f.id===o.item)) { toast("This field is already rented."); return }
+    s.fields.push({...fields.find(f=>f.id===o.item),months:o.months});
+  }
+  if(o.type==="crop") {
+    const c=crops.find(c=>c.id===o.item);
+    s.plants.push({...c,uid:++s.next,field:o.field,qty:o.qty,day:1,problem:false,
+      logs:[{text:"Crop order allocated to your field. Planting record created.",time:"Just now"}]});
+  }
+  if(o.type==="care") {
+    s.tasks.push({id:++s.next,order:o.id,plant:o.plant,service:o.item,name:o.name,status:"pending"});
+  }
+  s.orders.unshift(o); s.paid=o; s.pending=null; s.paymentFail=false; go("success");
+}
+function success() {
+  const o=s.paid;
+  if(!o) return home();
+  return `<div class="success"><div class="check">✓</div>
+    <div class="eyebrow">Payment successful</div>
+    <h1 style="margin-top:13px">${o.type==="field"?"Your plot is ready!":o.type==="crop"?"Let’s get growing!":"Care is on its way."}</h1>
+    <p class="muted">${o.type==="care"?"A task has been sent to the farmer's demo task list.":"Your order has been added to your farm."}</p>
+  </div><div class="card"><div class="summary-row"><span>Order</span><strong>#FF${o.id}</strong></div>
+    <div class="summary-row"><span>${o.name}</span><strong>${money(o.total)}</strong></div></div>
+    <div class="stack">
+    ${o.type==="field"?btn("Choose crops →","explore('crops')")+btn("Rent another field","explore('fields')","secondary"):
+      o.type==="crop"?btn("View my farm →","go('home')")+btn("Order more crops","explore('crops')","secondary"):
+      btn("View my farm","go('home')")+btn("Switch to farmer demo →","switchRole()","secondary")}
+    ${btn("View orders","go('orders')","outline")}</div>`;
+}
+function cropStatus() {
+  const p=s.plants.find(x=>x.uid===s.selected);
+  if(!p) return home();
+  const f=s.fields.find(x=>x.id===p.field);
+  const pending=s.tasks.some(t=>t.plant===p.uid&&t.status==="pending");
+  return `<div class="crop-art">${p.icon}</div>
+    <div class="row"><h1>${p.name}</h1><span class="pill ${p.problem?"warn":""}">${p.problem?"⚠ Needs care":"✓ Healthy"}</span></div>
+    <p class="muted">${f?.name||"Your field"} · Plot ${f?.plot||""}</p>
+    <div class="grid"><div class="stat"><strong>Day ${p.day}</strong><span>Since planting</span></div>
+    <div class="stat"><strong>~${Math.max(0,p.days-p.day)} days</strong><span>Until harvest</span></div></div>
+    <div class="progress"><span style="width:${Math.max(4,p.day/p.days*100)}%"></span></div>
+    ${p.problem?`<div class="notice"><strong>Soil needs attention</strong><br>
+      Demo observation: soil appears dry. Watering is recommended.</div>`:
+      `<div class="notice good"><strong>Growing well</strong><br>No issues reported in the latest demo check.</div>`}
+    ${pending?`<div class="notice good">Care requested. Waiting for the farmer's work report.</div>`:""}
+    <div class="stack">
+    ${btn(pending?"Book another service":"Book care service",`go('services',${p.uid})`)}
+    ${btn(p.problem?"Not now — back to farm":"Back to farm","go('home')","outline")}</div>
+    <div class="section"><h3>Farm journal</h3></div>
+    <div class="timeline">${p.logs.slice().reverse().map(l=>`
+      <p><strong class="small">${esc(l.time)}</strong><br>${esc(l.text)}</p>`).join("")}</div>
+    <hr><div class="eyebrow">Demo controls</div>
+    <button class="link" onclick="toggleHealth(${p.uid})">
+      ${p.problem?"Simulate healthy follow-up check":"Simulate crop needing care"} →</button>`;
+}
+function toggleHealth(uid) {
+  const p=s.plants.find(x=>x.uid===uid);
+  p.problem=!p.problem;
+  if(p.day===1) p.day=18;
+  p.logs.push({time:"Demo observation",text:p.problem?
+    "Simulated later check: soil is dry. Watering recommended.":
+    "Simulated follow-up check: crop is growing well."});
+  render();
+}
+function careMenu() {
+  const p=s.plants.find(x=>x.uid===s.selected);
+  if(!p) return home();
+  return `<h1>A helping hand</h1><p class="muted">Book care for your ${p.name.toLowerCase()}.</p>
+    ${services.map(v=>`<div class="card"><div class="row">
+    <span style="font-size:32px">${v.icon}</span><strong>${money(v.price)}</strong></div>
+    <h3 style="margin-top:12px">${v.name}</h3><p class="muted">${v.desc}</p>
+    ${btn("Choose "+v.name.toLowerCase(),`buyCare(${v.id},${p.uid})`,"secondary")}</div>`).join("")}`;
+}
+function buyCare(id,uid) {
+  const v=services.find(x=>x.id===id),p=s.plants.find(x=>x.uid===uid);
+  const f=s.fields.find(x=>x.id===p.field);
+  begin({type:"care",item:id,plant:uid,name:v.name,total:v.price,
+    detail:p.name+" · "+f.name+" · Plot "+f.plot},"home");
+}
+function orders() {
+  return `<h1>Your orders</h1><p class="muted">Every step of your growing journey.</p>
+    ${s.orders.length?s.orders.map(o=>{
+      const task=s.tasks.find(t=>t.order===o.id);
+      return `<div class="card"><div class="row"><span class="small muted">#FF${o.id}</span>
+      <span class="pill">${task?(task.status==="done"?"Care completed":"Awaiting farmer"):"Paid"}</span></div>
+      <h3 style="margin-top:14px">${o.name}</h3><p class="muted">${esc(o.detail)}</p>
+      <div class="row"><span class="small">${{field:"Field rental",crop:"Crop order",care:"Care service"}[o.type]}</span><strong>${money(o.total)}</strong></div></div>`;
+    }).join(""):`<div class="empty"><div class="emoji">🧺</div><h3>No orders yet</h3>
+    <p class="muted">Your farm’s story starts with your first order.</p>${btn("Explore fields","explore('fields')")}</div>`}`;
+}
+function tasks() {
+  return `<div class="eyebrow">FARMER WORKSPACE</div><h1 style="margin-top:10px">Today’s care</h1>
+    <p class="muted">Small tasks. Healthier farms.</p>
+    <div class="grid" style="margin-bottom:20px">
+      <div class="stat"><strong>${s.tasks.filter(t=>t.status==="pending").length}</strong><span>Pending tasks</span></div>
+      <div class="stat"><strong>${s.tasks.filter(t=>t.status==="done").length}</strong><span>Completed</span></div></div>
+    ${s.tasks.length?s.tasks.map(t=>{
+      const p=s.plants.find(p=>p.uid===t.plant);
+      return `<div class="card"><div class="row"><h3>${t.name}</h3>
+        <span class="pill ${t.status==="pending"?"warn":""}">${t.status==="pending"?"To do":"Completed"}</span></div>
+        <p class="muted">${p?.name||"Crop"} · Order #FF${t.order}</p>
+        ${btn("View task →",`go('task',${t.id})`,"secondary")}</div>`;
+    }).join(""):`<div class="empty"><div class="emoji">🌤️</div><h3>All quiet on the farm</h3>
+      <p class="muted">Book a care service as a customer to create a farmer task.</p>
+      ${btn("Switch to customer","switchRole()","secondary")}</div>`}`;
+}
+function taskDetail() {
+  const t=s.tasks.find(t=>t.id===s.selected);
+  if(!t) return tasks();
+  const p=s.plants.find(p=>p.uid===t.plant),f=s.fields.find(f=>f.id===p.field);
+  return `<span class="pill">TASK #${t.id}</span><h1 style="margin-top:15px">${t.name}</h1>
+    <div class="card"><h3>${p.icon} ${p.name}</h3><p class="muted">${f.name} · Plot ${f.plot}</p>
+    <p>Customer: ${esc(s.name)}<br>Related order: #FF${t.order}</p></div>
+    ${t.status==="done"?`<div class="notice good"><strong>Work report submitted</strong><br>${esc(t.report)}</div>
+      ${btn("Back to tasks","go('tasks')")}`:`
+      <div class="notice">In the real service, the farmer performs this task offline before submitting a report.</div>
+      <form onsubmit="completeTask(event,${t.id})">
+        <label for="report">Work report</label>
+        <textarea id="report" required maxlength="500" placeholder="Describe the work completed…"></textarea>
+        <label style="display:flex;align-items:flex-start;gap:10px;font-weight:400;line-height:1.5">
+          <input type="checkbox" required style="width:18px;margin-top:2px">
+          I have completed the task (simulated for this demo).
+        </label>
+        <button class="btn" type="submit" style="margin-top:14px">Submit completed work</button>
+      </form>`}`;
+}
+function completeTask(event,id) {
+  event.preventDefault();
+  const text=$("report").value.trim();
+  if(!text) { toast("Please enter a work report."); return }
+  const t=s.tasks.find(t=>t.id===id);
+  if(t.status==="done") return;
+  t.status="done"; t.report=text;
+  const p=s.plants.find(p=>p.uid===t.plant);
+  p.logs.push({time:"Just now · Farmer report",text:t.name+" completed. "+text});
+  go("tasks"); toast("Work submitted. Customer journal and order updated.");
+}
+function profile() {
+  return `<div class="empty" style="padding-bottom:12px"><div class="emoji">${s.role==="farmer"?"👨‍🌾":"🧑‍🌾"}</div>
+    <h1>${s.role==="farmer"?"Farmer workspace":esc(s.name)}</h1>
+    <span class="pill">${s.role==="farmer"?"Farmer":"Customer"} · Demo account</span></div>
+    <div class="card"><h3>Demo payment</h3><p class="muted">Demo card •••• 4242<br>No actual billing information stored.</p></div>
+    <div class="stack">${btn("⇄ Switch to "+(s.role==="farmer"?"customer":"farmer"),"switchRole()","secondary")}</div>
+    <div class="section"><h3>Presentation controls</h3><p class="muted small">Loading a scene replaces current demo data.</p></div>
+    <div class="stack">
+      ${btn("① Start as a new customer","scene('new')","outline")}
+      ${btn("② Load a growing farm","scene('grown')","outline")}
+      ${btn("③ Load a crop needing care","scene('care')","outline")}
+      ${btn("Reset entire demo","resetDemo()","outline")}
+      ${btn("Log out","logout()","secondary")}
+    </div>
+    <p class="small muted" style="margin-top:22px">FanFarmer classroom prototype.<br>
+    Data is kept in memory and resets on refresh. Login, payment and task delivery are simulated.</p>`;
+}
+function logout() {
+  s.logged=false; s.role="customer"; s.pending=null; go("welcome");
+}
+render();
+</script>
+</body>
+</html>
